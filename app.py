@@ -5,7 +5,7 @@ analytics, adaptive difficulty, progress tracking, and interview coaching.
 Powered by the Groq API (groq.com) with an AI cross-validation layer to prevent hallucinations.
 """
 
-from flask import Flask, render_template, request, jsonify, redirect
+from flask import Flask, render_template, request, jsonify, redirect, send_from_directory
 from flask_cors import CORS
 from config import config
 from puzzle_generator import PuzzleGenerator
@@ -81,6 +81,13 @@ def login():
 def logout():
     """Redirect to login page"""
     return redirect("/login")
+
+
+@app.route("/static/<path:filename>")
+def serve_static_file(filename):
+    """Explicit static file handler for serverless environments"""
+    static_dir = os.path.join(BASE_DIR, "static")
+    return send_from_directory(static_dir, filename)
 
 
 # ============== PUZZLE API ==============
