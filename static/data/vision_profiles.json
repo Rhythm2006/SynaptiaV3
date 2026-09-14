@@ -1,0 +1,154 @@
+{
+  "person_001": {
+    "id": "person_001",
+    "name": "Sarah Jenkins",
+    "relationship": "Daughter",
+    "description": "Sarah and I discussed preparing for Sunday by organizing the soccer gear and packing lunch.",
+    "avatar_color": "#6366f1",
+    "created_at": "2026-03-01T10:00:00",
+    "last_seen": "2026-09-10T02:03:07.889527",
+    "confidence": 0.96,
+    "tags": [
+      "Family",
+      "Frequent",
+      "Priority"
+    ],
+    "interactions": [
+      {
+        "ts": "2026-09-10T02:03:07.889497",
+        "transcript": "We discussed organizing the soccer gear and packing lunch for Sunday.",
+        "summary": "Sarah and I discussed preparing for Sunday by organizing the soccer gear and packing lunch.",
+        "sentiment": "Positive"
+      },
+      {
+        "ts": "2026-09-10T02:01:27.434832",
+        "transcript": "We discussed organizing the soccer gear and packing lunch for Sunday.",
+        "summary": "Discussed plans to organize soccer gear and pack lunch for an upcoming Sunday event.",
+        "sentiment": "neutral-positive"
+      },
+      {
+        "ts": "2026-09-10T01:55:34.361042",
+        "transcript": "We discussed organizing the soccer gear and packing lunch for Sunday.",
+        "summary": "Sarah and the user talked about getting the soccer gear organized and preparing lunch for the upcoming Sunday.",
+        "sentiment": "neutral-positive"
+      },
+      {
+        "ts": "2026-09-10T01:50:51.916875",
+        "transcript": "We discussed organizing the soccer gear and packing lunch for Sunday.",
+        "summary": "Sarah and the user talked about preparing for Sunday by organizing soccer gear and packing lunch.",
+        "sentiment": "neutral-positive"
+      },
+      {
+        "ts": "2026-09-10T01:47:45.124394",
+        "transcript": "We discussed organizing the soccer gear and packing lunch for Sunday.",
+        "summary": "Sarah talked about plans to organize soccer gear and pack lunch for an upcoming Sunday event.",
+        "sentiment": "neutral"
+      },
+      {
+        "ts": "2026-09-10T01:44:44.937513",
+        "transcript": "We discussed organizing the soccer gear and packing lunch for Sunday.",
+        "summary": "Sarah and the user discussed preparing for Sunday by organizing soccer gear and packing lunch.",
+        "sentiment": "Positive and collaborative"
+      },
+      {
+        "ts": "2026-09-10T01:40:43.181517",
+        "transcript": "We discussed organizing the soccer gear and packing lunch for Sunday.",
+        "summary": "Sarah and the user talked about preparing for Sunday by organizing soccer gear and packing lunch.",
+        "sentiment": "neutral-positive"
+      },
+      {
+        "ts": "2026-09-10T01:33:46.297808",
+        "transcript": "We discussed organizing the soccer gear and packing lunch for Sunday.",
+        "summary": "Sarah and the user talked about preparing for a Sunday event by organizing soccer gear and packing lunch.",
+        "sentiment": "neutral-positive"
+      },
+      {
+        "ts": "2026-09-10T01:29:46.268343",
+        "transcript": "We discussed organizing the soccer gear and packing lunch for Sunday.",
+        "summary": "Sarah and the user talked about preparing for Sunday by organizing soccer gear and packing lunch.",
+        "sentiment": "neutral-positive"
+      },
+      {
+        "ts": "2026-09-10T01:10:59.458733",
+        "transcript": "We discussed organizing the soccer gear and packing lunch for Sunday.",
+        "summary": "Sarah and the user talked about preparing for Sunday by organizing soccer gear and packing lunch.",
+        "sentiment": "neutral-positive"
+      },
+      {
+        "ts": "2026-09-10T00:59:30.361486",
+        "transcript": "We discussed organizing the soccer gear and packing lunch for Sunday.",
+        "summary": "Discussed 11 words covering key topics with Sarah Jenkins. Last point noted: '['discussed', 'organizing', 'the', 'soccer', 'gear', 'and', 'packing', 'lunch', 'for', 'Sunday.']'",
+        "sentiment": "Neutral / Positive"
+      },
+      {
+        "ts": "2026-03-08T16:45:00",
+        "summary": "Shared news regarding the architecture team expansion. Reminded about Sunday brunch at 11:00 AM.",
+        "sentiment": "Positive / Joyful"
+      },
+      {
+        "ts": "2026-03-05T19:20:00",
+        "summary": "Discussed travel arrangements for upcoming spring break visit.",
+        "sentiment": "Warm"
+      }
+    ]
+  },
+  "person_002": {
+    "id": "person_002",
+    "name": "Dr. Aris Thorne",
+    "relationship": "Neurologist & Physician",
+    "description": "Primary cognitive wellness physician. Recommended daily Synaptia logical puzzles and tracking working memory retention.",
+    "avatar_color": "#06b6d4",
+    "created_at": "2026-02-15T09:30:00",
+    "last_seen": "2026-03-06T14:10:00",
+    "confidence": 0.94,
+    "tags": [
+      "Medical",
+      "Wellness",
+      "Advisor"
+    ],
+    "interactions": [
+      {
+        "ts": "2026-03-06T14:10:00",
+        "summary": "Reviewed 30-day cognitive puzzle metrics. Noted a 14% improvement in pattern decomposition speed.",
+        "sentiment": "Encouraging"
+      }
+    ]
+  },
+  "person_003": {
+    "id": "person_003",
+    "name": "Marcus Vance",
+    "relationship": "Research Partner",
+    "description": "Collaborating on multimodal perceptual systems, real-time speaker diarization, and edge AI memory indexing.",
+    "avatar_color": "#10b981",
+    "created_at": "2026-02-20T11:15:00",
+    "last_seen": "2026-03-09T18:00:00",
+    "confidence": 0.91,
+    "tags": [
+      "Work",
+      "AI Research",
+      "Active"
+    ],
+    "interactions": [
+      {
+        "ts": "2026-03-09T18:00:00",
+        "summary": "Brainstormed low-latency WebRTC pipelines and Ray-Ban smart glass HUD overlays for instant memory recall.",
+        "sentiment": "Focused / Collaborative"
+      }
+    ]
+  },
+  "person_170260": {
+    "id": "person_170260",
+    "name": "Dr. Clara Oswald",
+    "relationship": "Research Collaborator",
+    "description": "Specialist in neurological linguistics.",
+    "avatar_color": "#f59e0b",
+    "face_thumbnail": null,
+    "created_at": "2026-09-10T00:59:30.260511",
+    "last_seen": "2026-09-10T02:03:06.235108",
+    "confidence": 0.95,
+    "tags": [
+      "Enrolled"
+    ],
+    "interactions": []
+  }
+}

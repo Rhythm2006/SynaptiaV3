@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Synaptia is a compassionate companion for the mind—designed to gently support, strengthen, and reconnect individuals facing neurological challenges through adaptive cognitive exercises.">
+    <title>Synaptia — Your Neurological Companion</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+
+    <div id="cursor" class="cursor"></div>
+    <div id="cursorTrail" class="cursor-trail"></div>
+
+    <!-- ======== NAVBAR ======== -->
+    <nav class="navbar" id="navbar">
+        <div class="navbar-inner">
+            <a class="brand" href="#" onclick="navigateTo('home')">
+                <div class="brand-icon-wrap">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2.5">
+                        <polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2" />
+                    </svg>
+                </div>
+                <span class="brand-text">Synaptia</span>
+            </a>
+            <div class="nav-links" id="navLinks">
+                <button class="nav-link active" onclick="navigateTo('home')" data-page="home">Home</button>
+                <button class="nav-link" onclick="navigateTo('puzzle')" data-page="puzzle">Exercises</button>
+                <button class="nav-link" onclick="navigateTo('chat')" data-page="chat">Companion</button>
+                <button class="nav-link" onclick="navigateTo('v2')" data-page="v2">Synaptia V2 <span class="v2-nav-badge">V2</span></button>
+                <button class="nav-link" onclick="navigateTo('stats')" data-page="stats">Progress</button>
+            </div>
+            <div class="navbar-right">
+                <div class="stats-pill" id="statsPill">
+                    <span class="stat-item">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <polyline points="15 3 21 3 21 9" />
+                            <polyline points="9 21 3 21 3 15" />
+                            <line x1="21" y1="3" x2="14" y2="10" />
+                            <line x1="3" y1="21" x2="10" y2="14" />
+                        </svg>
+                        <span id="navSolved">0</span> Solved
+                    </span>
+                    <div class="stat-divider"></div>
+                    <span class="stat-item">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+                        </svg>
+                        <span id="navScore">0</span> pts
+                    </span>
+                </div>
+                <button id="themeToggle" class="icon-btn" title="Toggle theme" aria-label="Toggle theme">
+                    <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+                    </svg>
+                    <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" style="display:none">
+                        <circle cx="12" cy="12" r="5" />
+                        <line x1="12" y1="1" x2="12" y2="3" />
+                        <line x1="12" y1="21" x2="12" y2="23" />
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                        <line x1="1" y1="12" x2="3" y2="12" />
+                        <line x1="21" y1="12" x2="23" y2="12" />
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+                    </svg>
+                </button>
+                <div id="navUserProfile" class="nav-user-pill" style="display:none" title="Signed in user">
+                    <div id="navUserAvatar" class="nav-user-avatar">?</div>
+                    <span id="navUserName" class="nav-user-name">User</span>
+                </div>
+                <button id="logoutBtn" class="btn-logout" title="Sign out" aria-label="Sign out" style="display:none" onclick="handleLogout()">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                        <polyline points="16 17 21 12 16 7"/>
+                        <line x1="21" y1="12" x2="9" y2="12"/>
+                    </svg>
+                    <span>Logout</span>
+                </button>
+                <button class="hamburger" id="hamburger" aria-label="Menu">
+                    <span></span><span></span><span></span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <button class="mobile-link" onclick="navigateTo('home'); closeMobileMenu()">Home</button>
+        <button class="mobile-link" onclick="navigateTo('puzzle'); closeMobileMenu()">Exercises</button>
+        <button class="mobile-link" onclick="navigateTo('chat'); closeMobileMenu()">Companion</button>
+        <button class="mobile-link" onclick="navigateTo('v2'); closeMobileMenu()">Vision & Memory (V2)</button>
+        <button class="mobile-link" onclick="navigateTo('stats'); closeMobileMenu()">Progress</button>
+    </div>
+
+    <!-- ======== PAGE CONTAINER ======== -->
+    <div id="pageContainer">
+
+        <!-- ════ HOME ════ -->
+        <div class="page page-home active" id="page-home">
+
+            <!-- Hero -->
+            <section class="hero">
+                <div class="hero-bg">
+                    <div class="hero-orb orb-1"></div>
+                    <div class="hero-orb orb-2"></div>
+                    <div class="hero-orb orb-3"></div>
+                    <div class="hero-grid"></div>
+                </div>
+                <div class="hero-content">
+                    <div class="hero-badge">
+                        <span class="badge-dot"></span>
+                        Powered by <span id="heroModelName">Llama 3 8B (Local)</span>
+                    </div>
+                    <h1 class="hero-title">
+                        SUPPORT YOUR
+                        <span class="hero-title-accent">BEAUTIFUL
+                            <span class="hero-title-script">mind</span></span>
+                    </h1>
+                    <p class="hero-subtitle">More than just a platform, Synaptia is a companion for the mind—designed to walk alongside individuals facing neurological challenges by offering gentle, adaptive cognitive exercises.</p>
+                    <div class="hero-actions">
+                        <button class="btn btn-hero" onclick="navigateTo('puzzle')">
+                            <span>Begin Exercises</span>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <line x1="5" y1="12" x2="19" y2="12" />
+                                <polyline points="12 5 19 12 12 19" />
+                            </svg>
+                        </button>
+                        <button class="btn btn-ghost btn-v2-glow" onclick="navigateTo('v2')">
+                            <span>Vision & Memory</span>
+                            <span class="badge-v2-pill">V2</span>
+                        </button>
+                        <button class="btn btn-ghost" onclick="navigateTo('chat')">
+                            Talk to Companion
+                        </button>
+                    </div>
+                    <div class="hero-metrics">
+                        <div class="hero-metric">
+                            <span class="metric-val">5</span>
+                            <span class="metric-lbl">Cognitive Areas</span>
+                        </div>
+                        <div class="metric-sep"></div>
+                        <div class="hero-metric">
+                            <span class="metric-val">3</span>
+                            <span class="metric-lbl">Pacing Levels</span>
+                        </div>
+                        <div class="metric-sep"></div>
+                        <div class="hero-metric">
+                            <span class="metric-val">4</span>
+                            <span class="metric-lbl">Support Modes</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="hero-visual">
+                    <div class="puzzle-float-card">
+                        <div class="float-card-inner">
+                            <div class="float-tag">ACTIVE EXERCISE</div>
+                            <div class="float-q">I possess mountains with no stone, oceans with no water, and cities
+                                with no buildings. What am I?</div>
+                        </div>
+                    </div>
+                    <div class="chat-float-card">
+                        <div class="float-card-inner">
+                            <div class="float-role">Companion</div>
+                            <div class="float-msg">Take your time. Consider what medium can represent geographical features in an abstract,
+                                two-dimensional form...</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Why Cognitive Training -->
+            <section class="why-section">
+                <div class="why-inner">
+                    <div class="why-text">
+                        <span class="section-label">THE SCIENCE OF CONNECTION</span>
+                        <h2 class="section-title">How gentle cognitive support<br>helps you <span
+                                class="neon">rediscover clarity</span></h2>
+                        <p class="why-body">In moments when memories fade and thoughts feel distant, structured and compassionate exercises can help stimulate neural pathways. Synaptia is designed to gently strengthen and reconnect these pathways without overwhelming pressure.</p>
+                        <p class="why-body">Regular, patient engagement with adaptive exercises has been shown to support working memory consolidation, enhance processing comfort, and foster a renewed sense of confidence and self.</p>
+                        <div class="why-cta">
+                            <button class="btn btn-hero" onclick="navigateTo('puzzle')">Start a Session</button>
+                        </div>
+                    </div>
+                    <div class="why-pillars">
+                        <div class="pillar-card">
+                            <div class="pillar-icon">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="1.8">
+                                    <circle cx="12" cy="12" r="10" />
+                                    <line x1="12" y1="8" x2="12" y2="12" />
+                                    <line x1="12" y1="16" x2="12.01" y2="16" />
+                                </svg>
+                            </div>
+                            <h4>Gentle Reasoning</h4>
+                            <p>Systematic exercises help the mind construct comfortable inference chains — providing a sense of grounding and structure when thoughts feel scattered.</p>
+                        </div>
+                        <div class="pillar-card">
+                            <div class="pillar-icon">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="1.8">
+                                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+                                </svg>
+                            </div>
+                            <h4>Working Memory</h4>
+                            <p>Holding multiple constraints simultaneously in mind exercises short-term memory capacity
+                                and improves the ability to process complex, multi-variable situations.</p>
+                        </div>
+                        <div class="pillar-card">
+                            <div class="pillar-icon">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="1.8">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                                    <circle cx="12" cy="12" r="3" />
+                                </svg>
+                            </div>
+                            <h4>Lateral Thinking</h4>
+                            <p>Abstract riddles and wordplay challenges expand the cognitive repertoire by demanding
+                                non-linear approaches — building creative flexibility and intellectual agility.</p>
+                        </div>
+                        <div class="pillar-card">
+                            <div class="pillar-icon">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="1.8">
+                                    <line x1="12" y1="20" x2="12" y2="10" />
+                                    <line x1="18" y1="20" x2="18" y2="4" />
+                                    <line x1="6" y1="20" x2="6" y2="16" />
+                                </svg>
+                            </div>
+                            <h4>Measurable Progress</h4>
+                            <p>Adaptive difficulty and real-time scoring provide objective feedback on cognitive
+                                performance — turning abstract improvement into quantifiable, visible growth.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Feature Cards -->
+            <section class="features-section">
+                <div class="section-header">
+                    <span class="section-label">PLATFORM CAPABILITIES</span>
+                    <h2 class="section-title">A complete cognitive companion<br>built on <span
+                            class="neon">generative AI</span></h2>
+                </div>
+                <div class="features-grid">
+                    <div class="feature-card" onclick="navigateTo('puzzle')">
+                        <div class="feature-icon-wrap">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="1.8">
+                                <rect x="3" y="3" width="7" height="7" />
+                                <rect x="14" y="3" width="7" height="7" />
+                                <rect x="14" y="14" width="7" height="7" />
+                                <rect x="3" y="14" width="7" height="7" />
+                            </svg>
+                        </div>
+                        <h3>Five Distinct Disciplines</h3>
+                        <p>Riddles, mathematical reasoning, formal logic, wordplay, and curated trivia — each category
+                            targets a different cognitive faculty, ensuring comprehensive mental exercise.</p>
+                        <div class="feature-tags">
+                            <span>Riddle</span><span>Mathematics</span><span>Logic</span><span>+2</span>
+                        </div>
+                        <div class="feature-arrow">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <line x1="5" y1="12" x2="19" y2="12" />
+                                <polyline points="12 5 19 12 12 19" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="feature-card" onclick="navigateTo('puzzle')">
+                        <div class="feature-icon-wrap">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="1.8">
+                                <line x1="18" y1="20" x2="18" y2="10" />
+                                <line x1="12" y1="20" x2="12" y2="4" />
+                                <line x1="6" y1="20" x2="6" y2="14" />
+                            </svg>
+                        </div>
+                        <h3>Adaptive Difficulty Architecture</h3>
+                        <p>Three calibrated difficulty tiers — Introductory, Intermediate, and Expert — let
+                            practitioners progress at an individually optimised pace while maintaining cognitive
+                            challenge.</p>
+                        <div class="feature-tags">
+                            <span class="tag-easy">Introductory</span><span class="tag-medium">Intermediate</span><span
+                                class="tag-hard">Expert</span>
+                        </div>
+                        <div class="feature-arrow">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <line x1="5" y1="12" x2="19" y2="12" />
+                                <polyline points="12 5 19 12 12 19" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="feature-card feature-card-accent" onclick="navigateTo('chat')">
+                        <div class="feature-icon-wrap">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="1.8">
+                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                            </svg>
+                        </div>
+                        <h3>Multi-Modal Companion</h3>
+                        <p>Four specialised interaction modes — Hint Assistant, Open Dialogue, Guided Tutor, and
+                            Creative Analyst — each designed to provide gentle, adaptive support.</p>
+                        <div class="feature-tags">
+                            <span>Hint Assistant</span><span>Tutor</span><span>Creative</span><span>+1</span>
+                        </div>
+                        <div class="feature-arrow">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <line x1="5" y1="12" x2="19" y2="12" />
+                                <polyline points="12 5 19 12 12 19" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="feature-card" onclick="navigateTo('stats')">
+                        <div class="feature-icon-wrap">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="1.8">
+                                <polygon
+                                    points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                            </svg>
+                        </div>
+                        <h3>Performance Analytics</h3>
+                        <p>Granular session statistics — including solve rate, time-per-puzzle, hint utilisation, and a
+                            cumulative score — provide objective, data-driven insight into your cognitive progress.</p>
+                        <div class="feature-tags">
+                            <span>Solve Rate</span><span>Speed Ranking</span>
+                        </div>
+                        <div class="feature-arrow">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <line x1="5" y1="12" x2="19" y2="12" />
+                                <polyline points="12 5 19 12 12 19" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="feature-card feature-card-v2" onclick="navigateTo('v2')">
+                        <div class="v2-card-badge">NEW IN V2</div>
+                        <div class="feature-icon-wrap v2-icon-wrap">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="1.8">
+                                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+                                <circle cx="12" cy="13" r="4" />
+                            </svg>
+                        </div>
+                        <h3>Multimodal Perception & Memory</h3>
+                        <p>Real-time face detection, identity context cards, conversational speech summarization, and futuristic Ray-Ban HUD smart glass overlay mode.</p>
+                        <div class="feature-tags">
+                            <span>Face Tracker</span><span>Neural Memory</span><span>Smart HUD</span><span>Audio Diarizer</span>
+                        </div>
+                        <div class="feature-arrow">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <line x1="5" y1="12" x2="19" y2="12" />
+                                <polyline points="12 5 19 12 12 19" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Quick Start Process -->
+            <section class="quickstart-section">
+                <div class="quickstart-inner">
+                    <div class="qs-text">
+                        <span class="section-label">GETTING STARTED</span>
+                        <h2>Begin your session in <span class="neon">under sixty seconds.</span></h2>
+                        <p>No registration required. Select a cognitive area, set your pacing, and receive an
+                            AI-crafted exercise — instantly unique, every session.</p>
+                        <button class="btn btn-hero" onclick="navigateTo('puzzle')">
+                            <span>Begin First Exercise</span>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <line x1="5" y1="12" x2="19" y2="12" />
+                                <polyline points="12 5 19 12 12 19" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="qs-visual">
+                        <div class="qs-step">
+                            <div class="qs-num">01</div>
+                            <div class="qs-info">
+                                <strong>Select Discipline &amp; Difficulty</strong>
+                                <span>5 categories across 3 calibrated tiers</span>
+                            </div>
+                        </div>
+                        <div class="qs-step">
+                            <div class="qs-num">02</div>
+                            <div class="qs-info">
+                                <strong>Receive an AI-Crafted Exercise</strong>
+                                <span>Uniquely generated — never repeated</span>
+                            </div>
+                        </div>
+                        <div class="qs-step">
+                            <div class="qs-num">03</div>
+                            <div class="qs-info">
+                                <strong>Solve and Accumulate Points</strong>
+                                <span>Speed and accuracy both rewarded</span>
+                            </div>
+                        </div>
+                        <div class="qs-step">
+                            <div class="qs-num">04</div>
+                            <div class="qs-info">
+                                <strong>Talk to Synaptia</strong>
+                                <span>Progressive hints and gentle guidance</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ════ HUMAN STORIES ════ -->
+            <section class="stories-section" id="storiesSection">
+                <div class="stories-inner">
+
+                    <!-- Section header -->
+                    <div class="stories-header scroll-fade">
+                        <span class="section-label">HUMAN STORIES</span>
+                        <h2 class="section-title">Behind every forgotten name<br>is a <span class="neon">life fully lived</span></h2>
+                        <p class="stories-lead">Alzheimer's and dementia do not define the people they touch. These are their stories — told with dignity, honoured with science.</p>
+                    </div>
+
+                    <!-- Featured story card -->
+                    <div class="story-card scroll-slide-up">
+                        <div class="story-image-col">
+                            <div class="story-img-wrap">
+                                <img src="/static/glen.jpg" alt="Glen Campbell, legendary country music star who shared his Alzheimer's journey publicly" class="story-photo" />
+                                <div class="story-img-overlay">
+                                    <div class="story-img-tag">
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+                                        Diagnosed 2011
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="story-name-plate">
+                                <strong>Glen Campbell</strong>
+                                <span>75 — Country Music Legend, Arkansas</span>
+                            </div>
+                        </div>
+
+                        <div class="story-text-col">
+                            <div class="story-quote-mark">&ldquo;</div>
+                            <blockquote class="story-quote">
+                                I'm not gonna let it stop me. If I mess up a lyric, people are gonna say Glen's forgot the words — but that's okay. I've never been perfect, and I've never pretended to be.
+                            </blockquote>
+                            <div class="story-body">
+                                <p>Glen Campbell — the voice behind "Rhinestone Cowboy" and "Wichita Lineman" — was one of the best-selling music artists of the 20th century. In June 2011, aged 75, he publicly announced a diagnosis of Alzheimer's disease, a moment of extraordinary courage at a time when stigma often kept such diagnoses private. Rather than retreat, he embarked on a 151-date "Goodbye Tour" across the United States and the United Kingdom.</p>
+                                <p>Accompanied by his family on stage every night, Glen performed even as the disease advanced, sometimes forgetting lyrics mid-song but never losing the warmth that defined his artistry. The 2014 documentary <em>I'll Be Me</em> captured his journey — and helped change the national conversation about Alzheimer's. He passed away in August 2017, but his openness gave millions of families the language to talk about a condition they had long faced in silence.</p>
+                            </div>
+                            <div class="story-tags">
+                                <span class="story-tag">Alzheimer's Disease</span>
+                                <span class="story-tag">Public Advocacy</span>
+                                <span class="story-tag">Music &amp; Memory</span>
+                                <span class="story-tag">Farewell Tour 2011–2012</span>
+                            </div>
+                            <div class="story-cta">
+                                <button class="btn btn-ghost" onclick="navigateTo('puzzle')">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2"/></svg>
+                                    Begin an exercise in Glen's honour
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Awareness stats banner -->
+                    <div class="awareness-banner scroll-fade">
+                        <div class="awareness-stat" data-count="55">
+                            <div class="awareness-num"><span class="aw-count">55</span><span class="aw-unit">M+</span></div>
+                            <div class="awareness-label">People worldwide living with dementia</div>
+                        </div>
+                        <div class="awareness-divider"></div>
+                        <div class="awareness-stat" data-count="10">
+                            <div class="awareness-num"><span class="aw-count">10</span><span class="aw-unit">M</span></div>
+                            <div class="awareness-label">New cases diagnosed every year</div>
+                        </div>
+                        <div class="awareness-divider"></div>
+                        <div class="awareness-stat" data-count="60">
+                            <div class="awareness-num"><span class="aw-count">60</span><span class="aw-unit">%</span></div>
+                            <div class="awareness-label">Of cases are Alzheimer's disease</div>
+                        </div>
+                        <div class="awareness-divider"></div>
+                        <div class="awareness-stat">
+                            <div class="awareness-num"><span class="aw-count">3</span><span class="aw-unit">x</span></div>
+                            <div class="awareness-label">Risk reduction with regular cognitive engagement</div>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+            <!-- ════ END HUMAN STORIES ════ -->
+
+        </div>
+
+        <!-- ════ PUZZLE ════ -->
+        <div class="page page-puzzle" id="page-puzzle">
+
+            <!-- ── Page intro banner ── -->
+            <div class="exercise-intro-banner">
+                <div class="eib-inner">
+                    <div class="eib-text">
+                        <span class="section-label">COGNITIVE REHABILITATION</span>
+                        <h2 class="eib-title">Every exercise targets a <span class="neon">specific neurological deficit</span></h2>
+                        <p class="eib-body">Cognitive decline in conditions like Alzheimer's and dementia is not uniform — it attacks distinct brain systems at different rates. Synaptia's exercise disciplines are mapped directly to those systems, training the precise neural circuits that deterioration disrupts first.</p>
+                    </div>
+                    <div class="eib-stats">
+                        <div class="eib-stat">
+                            <div class="eib-stat-val">5</div>
+                            <div class="eib-stat-lbl">Neural circuits<br>targeted</div>
+                        </div>
+                        <div class="eib-stat-div"></div>
+                        <div class="eib-stat">
+                            <div class="eib-stat-val">3×</div>
+                            <div class="eib-stat-lbl">Risk reduction<br>with engagement</div>
+                        </div>
+                        <div class="eib-stat-div"></div>
+                        <div class="eib-stat">
+                            <div class="eib-stat-val">AI</div>
+                            <div class="eib-stat-lbl">Cross-validated<br>every challenge</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="puzzle-page-layout">
+                <div class="puzzle-col-left">
+                    <!-- Control Panel -->
+                    <div class="control-panel-card">
+                        <div class="cp-header">
+                            <div>
+                                <h2>Configure Exercise</h2>
+                                <p class="cp-sub">Choose your discipline and difficulty, then generate a unique AI challenge</p>
+                            </div>
+                            <div id="timerDisplay" class="timer-chip">00:00</div>
+                        </div>
+                        <div class="cp-controls">
+                            <div class="control-group">
+                                <label class="ctrl-label">Difficulty Tier</label>
+                                <div class="difficulty-cards" id="difficultyGroup">
+                                    <button class="diff-card seg-btn" data-value="easy" onclick="selectDifficulty('easy')">
+                                        <div class="diff-card-top"><span class="diff-card-name">Introductory</span><span class="diff-xp">+100 XP</span></div>
+                                        <p class="diff-card-desc">Accessible pacing — ideal for warm-up sessions.</p>
+                                    </button>
+                                    <button class="diff-card seg-btn active" data-value="medium" onclick="selectDifficulty('medium')">
+                                        <div class="diff-card-top"><span class="diff-card-name">Intermediate</span><span class="diff-xp">+150 XP</span></div>
+                                        <p class="diff-card-desc">Moderate challenge — requires sustained focus.</p>
+                                    </button>
+                                    <button class="diff-card seg-btn" data-value="hard" onclick="selectDifficulty('hard')">
+                                        <div class="diff-card-top"><span class="diff-card-name">Expert</span><span class="diff-xp">+200 XP</span></div>
+                                        <p class="diff-card-desc">High cognitive load — demands rigorous insight.</p>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label class="ctrl-label">Cognitive Discipline</label>
+                                <div class="discipline-grid" id="typeGrid">
+                                    <button class="disc-card type-btn active" data-value="riddle" onclick="selectType('riddle')">
+                                        <div class="disc-icon-wrap"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+                                        <div class="disc-info"><strong>Riddle</strong><span>Lateral thinking</span></div>
+                                    </button>
+                                    <button class="disc-card type-btn" data-value="math" onclick="selectType('math')">
+                                        <div class="disc-icon-wrap"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg></div>
+                                        <div class="disc-info"><strong>Mathematics</strong><span>Quantitative logic</span></div>
+                                    </button>
+                                    <button class="disc-card type-btn" data-value="logic" onclick="selectType('logic')">
+                                        <div class="disc-icon-wrap"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+                                        <div class="disc-info"><strong>Logic</strong><span>Deductive reasoning</span></div>
+                                    </button>
+                                    <button class="disc-card type-btn" data-value="wordplay" onclick="selectType('wordplay')">
+                                        <div class="disc-icon-wrap"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+                                        <div class="disc-info"><strong>Wordplay</strong><span>Linguistic agility</span></div>
+                                    </button>
+                                    <button class="disc-card type-btn" data-value="trivia" onclick="selectType('trivia')">
+                                        <div class="disc-icon-wrap"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
+                                        <div class="disc-info"><strong>Trivia</strong><span>Memory recall</span></div>
+                                    </button>
+                                </div>
+                            </div>
+                            <button id="generateBtn" class="btn-generate-main" onclick="generatePuzzle()">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                                Generate Exercise
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Empty State -->
+                    <div id="emptyState" class="empty-state-card">
+                        <div class="empty-inner">
+                            <div class="empty-icon-ring">
+                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2"/></svg>
+                            </div>
+                            <h3>Your Exercise Will Appear Here</h3>
+                            <p>Configure your difficulty and discipline above, then hit <strong>Generate Exercise</strong>. Each challenge is uniquely crafted by AI — no two sessions are the same.</p>
+                            <div class="empty-steps">
+                                <div class="empty-step"><div class="empty-step-num">1</div><span>Pick difficulty</span></div>
+                                <div class="empty-step-arrow">→</div>
+                                <div class="empty-step"><div class="empty-step-num">2</div><span>Choose discipline</span></div>
+                                <div class="empty-step-arrow">→</div>
+                                <div class="empty-step"><div class="empty-step-num">3</div><span>Generate &amp; solve</span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Puzzle Card -->
+                    <div id="puzzleCard" class="puzzle-display-card hidden">
+                        <div class="puzzle-card-header">
+                            <div class="puzzle-meta">
+                                <span id="puzzleTypeLabel" class="puzzle-type-badge">Riddle</span>
+                                <span id="puzzleBadge" class="diff-badge badge-medium">Intermediate</span>
+                            </div>
+                            <div class="puzzle-header-right">
+                                <span class="puzzle-xp-label" id="puzzleXpLabel">+150 XP on solve</span>
+                                <button class="icon-btn-sm" onclick="resetPuzzle()" title="New Puzzle">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.07"/></svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="puzzle-objective-row">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                            <span>Read carefully and reason through the clues before submitting your answer.</span>
+                        </div>
+                        <div class="puzzle-question-box">
+                            <div class="pq-accent"></div>
+                            <p id="puzzleQuestion" class="puzzle-question-text"></p>
+                        </div>
+                        <div class="answer-section">
+                            <div class="answer-label-row">
+                                <label class="answer-label" for="answerInput">Your Answer</label>
+                                <span class="answer-hint-text">Press Enter to submit</span>
+                            </div>
+                            <div class="answer-row">
+                                <input type="text" id="answerInput" class="answer-input" placeholder="Type your answer here…" autocomplete="off">
+                                <button id="submitBtn" class="btn-check-answer" onclick="checkAnswer()">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                                    Verify
+                                </button>
+                            </div>
+                            <div id="feedbackArea" class="feedback-area hidden"></div>
+                        </div>
+                        <div id="hintsArea" class="hints-area"></div>
+                        <div class="puzzle-actions-row">
+                            <button id="hintBtn" class="action-pill" onclick="getHint()">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                                Request Hint <span id="hintCount" class="hint-count">0/3</span>
+                            </button>
+                            <button id="solutionBtn" class="action-pill" onclick="showSolution()">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                Reveal Solution
+                            </button>
+                            <button class="action-pill pill-ghost" onclick="navigateTo('chat')">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                                Ask AI Companion
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- History -->
+                    <div class="history-panel">
+                        <div class="history-header">
+                            <h3>Session History</h3>
+                            <button class="text-btn" onclick="clearHistory()">Clear</button>
+                        </div>
+                        <div id="historyList" class="history-items">
+                            <div class="history-empty">No puzzles attempted yet — begin your first session above.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RIGHT sidebar -->
+                <div class="puzzle-col-right">
+
+                    <!-- ── Neuroscience Panel ── -->
+                    <div class="neuro-panel" id="neuroPanel">
+                        <div class="neuro-panel-header">
+                            <div class="neuro-header-icon">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.46 2.5 2.5 0 0 1-1.96-3 2.5 2.5 0 0 1-1.32-4.24 3 3 0 0 1 .34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2Z"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.46 2.5 2.5 0 0 0 1.96-3 2.5 2.5 0 0 0 1.32-4.24 3 3 0 0 0-.34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2Z"/></svg>
+                            </div>
+                            <div>
+                                <h3 id="neuroPanelTitle">Select a Discipline</h3>
+                                <span class="neuro-panel-sub">Neuroscience &amp; Clinical Context</span>
+                            </div>
+                        </div>
+
+                        <!-- Problem being solved -->
+                        <div class="neuro-section" id="neuroProblem">
+                            <div class="neuro-section-label">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                                THE PROBLEM
+                            </div>
+                            <p id="neuroProblemText" class="neuro-body">Choose a discipline above to see which neurological deficit it addresses and why it matters in cognitive rehabilitation.</p>
+                        </div>
+
+                        <!-- Brain regions -->
+                        <div class="neuro-section" id="neuroRegions">
+                            <div class="neuro-section-label">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.46 2.5 2.5 0 0 1-1.96-3 2.5 2.5 0 0 1-1.32-4.24 3 3 0 0 1 .34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2Z"/></svg>
+                                BRAIN REGIONS ACTIVATED
+                            </div>
+                            <div id="neuroRegionTags" class="neuro-region-tags">
+                                <span class="neuro-region-empty">Select a discipline to see active regions</span>
+                            </div>
+                        </div>
+
+                        <!-- Biology -->
+                        <div class="neuro-section">
+                            <div class="neuro-section-label">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                                THE BIOLOGY
+                            </div>
+                            <p id="neuroBioText" class="neuro-body neuro-bio">—</p>
+                        </div>
+
+                        <!-- Research callout -->
+                        <div class="neuro-callout" id="neuroCallout">
+                            <div class="neuro-callout-icon">📄</div>
+                            <p id="neuroCalloutText">Select a discipline to view relevant clinical research context.</p>
+                        </div>
+                    </div>
+
+                    <!-- ── Hint System ── -->
+                    <div class="quick-hints-card">
+                        <h3 class="qh-title">Progressive Hint System</h3>
+                        <p class="qh-subtitle">Three calibrated clue tiers — reveal only what you need, preserving the cognitive challenge.</p>
+                        <div class="qh-buttons">
+                            <button class="qh-btn" data-hint="0" onclick="getHint(0)">
+                                <div class="qh-num">I</div>
+                                <div class="qh-info"><strong>Directional Clue</strong><span>Points toward the solution domain</span></div>
+                                <div class="qh-penalty">−25 pts</div>
+                            </button>
+                            <button class="qh-btn" data-hint="1" onclick="getHint(1)">
+                                <div class="qh-num">II</div>
+                                <div class="qh-info"><strong>Elimination Clue</strong><span>Significantly narrows the solution space</span></div>
+                                <div class="qh-penalty">−25 pts</div>
+                            </button>
+                            <button class="qh-btn" data-hint="2" onclick="getHint(2)">
+                                <div class="qh-num">III</div>
+                                <div class="qh-info"><strong>Confirmatory Clue</strong><span>Near-conclusive — preserves the final insight</span></div>
+                                <div class="qh-penalty">−25 pts</div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- ── Scoring ── -->
+                    <div class="scoring-info-card">
+                        <h3>Scoring System</h3>
+                        <div class="score-detail">
+                            <span class="score-row"><span class="score-key">Base Reward</span><span class="score-val">Intro 100 · Mid 150 · Expert 200</span></span>
+                            <span class="score-row"><span class="score-key">Speed Bonus</span><span class="score-val">Up to +300 pts — decreases linearly</span></span>
+                            <span class="score-row"><span class="score-key">Hint Penalty</span><span class="score-val">−25 pts per hint revealed</span></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ════ CHAT ════ -->
+        <div class="page page-chat" id="page-chat">
+            <div class="chat-page-layout">
+                <div class="chat-sidebar">
+                    <div class="sidebar-section">
+                        <span class="sidebar-label">INTERACTION MODE</span>
+                        <div class="mode-list" id="modeList">
+                            <button class="mode-btn active" data-mode="hint_bot" onclick="selectMode('hint_bot')">
+                                <svg class="mode-icon" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="1.8">
+                                    <circle cx="12" cy="12" r="10" />
+                                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+                                    <line x1="12" y1="17" x2="12.01" y2="17" />
+                                </svg>
+                                <div class="mode-info">
+                                    <strong>Hint Assistant</strong>
+                                    <span>Guided puzzle support</span>
+                                </div>
+                            </button>
+                            <button class="mode-btn" data-mode="free_chat" onclick="selectMode('free_chat')">
+                                <svg class="mode-icon" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="1.8">
+                                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                                </svg>
+                                <div class="mode-info">
+                                    <strong>Open Dialogue</strong>
+                                    <span>Unrestricted conversation</span>
+                                </div>
+                            </button>
+                            <button class="mode-btn" data-mode="tutor" onclick="selectMode('tutor')">
+                                <svg class="mode-icon" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="1.8">
+                                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+                                </svg>
+                                <div class="mode-info">
+                                    <strong>Guided Tutor</strong>
+                                    <span>Structured instruction</span>
+                                </div>
+                            </button>
+                            <button class="mode-btn" data-mode="creative" onclick="selectMode('creative')">
+                                <svg class="mode-icon" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="1.8">
+                                    <polygon
+                                        points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                                </svg>
+                                <div class="mode-info">
+                                    <strong>Creative Analyst</strong>
+                                    <span>Lateral thinking exploration</span>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="sidebar-section">
+                        <span class="sidebar-label">SUGGESTED PROMPTS</span>
+                        <div class="quick-prompts">
+                            <button class="qp-btn"
+                                onclick="sendQuickPrompt('Provide a hint for my current puzzle without revealing the answer.')">Request
+                                a hint</button>
+                            <button class="qp-btn"
+                                onclick="sendQuickPrompt('Explain the underlying reasoning structure of this puzzle type.')">Explain
+                                reasoning structure</button>
+                            <button class="qp-btn"
+                                onclick="sendQuickPrompt('What cognitive strategies are most effective for solving riddles?')">Riddle-solving
+                                strategies</button>
+                            <button class="qp-btn"
+                                onclick="sendQuickPrompt('Share an interesting fact about how puzzles benefit cognitive development.')">Cognitive
+                                benefits</button>
+                        </div>
+                    </div>
+
+                    <button class="sidebar-clear-btn" onclick="clearChatSession()">
+                        Clear Conversation History
+                    </button>
+                </div>
+
+                <div class="chat-main">
+                    <div class="chat-header">
+                        <div class="chat-header-left">
+                            <div class="ai-avatar" id="aiAvatar">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="1.8">
+                                    <circle cx="12" cy="12" r="10" />
+                                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+                                    <line x1="12" y1="17" x2="12.01" y2="17" />
+                                </svg>
+                            </div>
+                            <div>
+                                <h2 id="chatModeName">Hint Assistant</h2>
+                                <span class="chat-status">
+                                    <span class="status-dot"></span>
+                                    AI Online — <span id="chatModelName">Llama 3 8B (Local)</span>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="chat-header-right">
+                            <span class="puzzle-context-badge" id="puzzleContextBadge" style="display:none">
+                                Puzzle Context Active
+                            </span>
+                        </div>
+                    </div>
+
+                    <div id="chatMessages" class="chat-messages-area">
+                        <div class="chat-msg bot">
+                            <div class="msg-avatar">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <circle cx="12" cy="12" r="10" />
+                                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+                                    <line x1="12" y1="17" x2="12.01" y2="17" />
+                                </svg>
+                            </div>
+                            <div class="msg-bubble">
+                                <p>Welcome. I am Synaptia's Cognitive Companion, powered by advanced AI models. Generate an exercise on the Exercises page and I will provide gentle guidance to support your reasoning process. You may also switch to Open Dialogue, Guided Tutor, or Creative Analyst mode using the panel on the left.</p>
+                                <span class="msg-time">Now</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="chat-input-area">
+                        <div class="chat-input-row">
+                            <div class="chat-input-wrap">
+                                <textarea id="chatInput" class="chat-textarea" placeholder="Type your message…" rows="1"
+                                    autocomplete="off"></textarea>
+                            </div>
+                            <button id="chatSendBtn" class="chat-send-btn" onclick="sendChatMessage()">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2.5">
+                                    <line x1="12" y1="19" x2="12" y2="5" />
+                                    <polyline points="5 12 12 5 19 12" />
+                                </svg>
+                            </button>
+                        </div>
+                        <p class="chat-disclaimer">AI responses are probabilistic. For definitive exercise answers, use
+                            the Reveal Solution button on the Exercises page.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ════ STATS ════ -->
+        <div class="page page-stats" id="page-stats">
+            <div class="stats-page-inner">
+                <div class="stats-page-header">
+                    <span class="section-label">SESSION ANALYTICS</span>
+                    <h1 class="stats-title">Performance <span class="neon">Dashboard</span></h1>
+                    <p>Objective, data-driven insight into your cognitive training progress.</p>
+                </div>
+
+                <div class="stats-main-grid">
+                    <div class="stat-hero-card">
+                        <div class="stat-hero-label-top">Cumulative Score</div>
+                        <div class="stat-hero-value" id="statTotalScore">0</div>
+                        <div class="stat-hero-sub">Points accumulated across all sessions</div>
+                    </div>
+                    <div class="stats-sub-grid">
+                        <div class="stat-mini-card">
+                            <div class="stat-mini-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="1.8">
+                                    <polyline points="20 6 9 17 4 12" />
+                                </svg>
+                            </div>
+                            <div class="stat-mini-val" id="statSolved">0</div>
+                            <div class="stat-mini-label">Exercises Completed</div>
+                        </div>
+                        <div class="stat-mini-card">
+                            <div class="stat-mini-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="1.8">
+                                    <line x1="18" y1="20" x2="18" y2="10" />
+                                    <line x1="12" y1="20" x2="12" y2="4" />
+                                    <line x1="6" y1="20" x2="6" y2="14" />
+                                </svg>
+                            </div>
+                            <div class="stat-mini-val" id="statWinRate">0%</div>
+                            <div class="stat-mini-label">Solve Rate</div>
+                        </div>
+                        <div class="stat-mini-card">
+                            <div class="stat-mini-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="1.8">
+                                    <circle cx="12" cy="12" r="10" />
+                                    <line x1="12" y1="8" x2="12" y2="12" />
+                                    <line x1="12" y1="16" x2="12.01" y2="16" />
+                                </svg>
+                            </div>
+                            <div class="stat-mini-val" id="statHints">0</div>
+                            <div class="stat-mini-label">Hints Used</div>
+                        </div>
+                        <div class="stat-mini-card">
+                            <div class="stat-mini-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="1.8">
+                                    <circle cx="12" cy="12" r="10" />
+                                    <polyline points="12 6 12 12 16 14" />
+                                </svg>
+                            </div>
+                            <div class="stat-mini-val" id="statAttempts">0</div>
+                            <div class="stat-mini-label">Total Attempts</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="activity-section">
+                    <h3>Recent Activity Log</h3>
+                    <div id="activityList" class="activity-list">
+                        <div class="activity-empty">
+                            <p>No activity recorded yet. <button class="text-btn" onclick="navigateTo('puzzle')">Begin
+                                    your first session</button></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="achievements-section">
+                    <h3>Milestones &amp; Achievements</h3>
+                    <div class="achievements-grid" id="achievementsGrid">
+                        <div class="achievement" id="ach-first">
+                            <div class="ach-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="1.8">
+                                    <circle cx="12" cy="8" r="6" />
+                                    <path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11" />
+                                </svg>
+                            </div>
+                            <div class="ach-name">First Resolution</div>
+                            <div class="ach-desc">Successfully complete your inaugural exercise</div>
+                        </div>
+                        <div class="achievement locked" id="ach-five">
+                            <div class="ach-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="1.8">
+                                    <rect x="2" y="11" width="20" height="11" rx="2" />
+                                    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                                </svg>
+                            </div>
+                            <div class="ach-name">Sustained Momentum</div>
+                            <div class="ach-desc">Complete five consecutive exercises</div>
+                        </div>
+                        <div class="achievement locked" id="ach-no-hints">
+                            <div class="ach-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="1.8">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                                    <circle cx="12" cy="12" r="3" />
+                                </svg>
+                            </div>
+                            <div class="ach-name">Unassisted Resolution</div>
+                            <div class="ach-desc">Complete an exercise without requesting any hints</div>
+                        </div>
+                        <div class="achievement locked" id="ach-hard">
+                            <div class="ach-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="1.8">
+                                    <polygon
+                                        points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                                </svg>
+                            </div>
+                            <div class="ach-name">Expert-Level Mastery</div>
+                            <div class="ach-desc">Complete an Expert-tier exercise</div>
+                        </div>
+                        <div class="achievement locked" id="ach-speed">
+                            <div class="ach-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="1.8">
+                                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+                                </svg>
+                            </div>
+                            <div class="ach-name">Accelerated Cognition</div>
+                            <div class="ach-desc">Complete an exercise in under 30 seconds</div>
+                        </div>
+                        <div class="achievement locked" id="ach-all-types">
+                            <div class="ach-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="1.8">
+                                    <rect x="3" y="3" width="7" height="7" />
+                                    <rect x="14" y="3" width="7" height="7" />
+                                    <rect x="14" y="14" width="7" height="7" />
+                                    <rect x="3" y="14" width="7" height="7" />
+                                </svg>
+                            </div>
+                            <div class="ach-name">Cognitive Polymath</div>
+                            <div class="ach-desc">Complete exercises across all five disciplines</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ════ SYNAPTIA V2 PORTAL ════ -->
+        <div class="page page-v2" id="page-v2">
+            <div class="v2-portal-container">
+                <div class="v2-portal-header">
+                    <div class="v2-portal-title-group">
+                        <div class="v2-pill-tag">
+                            <span class="v2-pulse-dot"></span>
+                            <span>SYNAPTIA V2.0 LIVE ENVIRONMENT</span>
+                        </div>
+                        <h2 class="v2-portal-title">Multimodal Vision & Memory Engine</h2>
+                        <p class="v2-portal-sub">Real-time WebRTC face tracking, speech diarization, and Ray-Ban smart glass HUD interface.</p>
+                    </div>
+                    <div class="v2-portal-actions">
+                        <a href="http://localhost:3000" target="_blank" rel="noopener noreferrer" class="btn btn-hero btn-sm">
+                            <span>Open in Fullscreen</span>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                                <polyline points="15 3 21 3 21 9"/>
+                                <line x1="10" y1="14" x2="21" y2="3"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="v2-frame-wrapper glass-panel">
+                    <iframe id="v2AppFrame" data-src="http://localhost:3000" class="v2-app-frame" allow="camera; microphone; display-capture; autoplay" title="Synaptia V2 Multimodal Vision"></iframe>
+                </div>
+            </div>
+        </div>
+
+    <!-- Solution Modal -->
+    <div id="solutionModal" class="modal-overlay hidden" onclick="handleModalOverlayClick(event)">
+        <div class="modal-card">
+            <button class="modal-close" onclick="closeModal()" aria-label="Close">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+            </button>
+            <div class="modal-icon">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <circle cx="12" cy="12" r="10" />
+                    <polyline points="12 6 12 12 16 14" />
+                </svg>
+            </div>
+            <h2 class="modal-heading">Solution Walkthrough</h2>
+            <div id="solutionBody" class="modal-body"></div>
+            <button class="btn-generate-main modal-ok-btn" onclick="closeModal()">Understood</button>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay hidden">
+        <div class="loader-card">
+            <div class="loader-ring">
+                <div class="loader-inner">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+                    </svg>
+                </div>
+            </div>
+            <p class="loader-text">Generating your exercise…</p>
+            <p class="loader-sub">Synaptia is crafting a unique challenge</p>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <script type="module" src="/static/script.js"></script>
+</body>
+
+</html>

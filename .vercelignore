@@ -1,0 +1,43 @@
+# Submodules & heavy nested directories
+SynaptiaV2-main/
+node_modules/
+package.json
+package-lock.json
+
+# Python caches and virtual environments
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+.venv/
+ENV/
+
+# Secrets & Local Environment
+.env
+.env.local
+.env.*.local
+*.key
+*.pem
+secrets/
+
+# Testing & Coverage
+.pytest_cache/
+htmlcov/
+.coverage
+coverage.xml
+tests/
+test_*.py
+
+# Git, IDE & OS
+.git/
+.github/
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Documentation
+*.md
