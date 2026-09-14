@@ -64,6 +64,8 @@ def apply_cors(response):
 # ============== WEB UI ==============
 
 @app.route("/")
+@app.route("/api/index")
+@app.route("/api/index.py")
 def index():
     """Serve the main web interface"""
     return render_template("index.html")
