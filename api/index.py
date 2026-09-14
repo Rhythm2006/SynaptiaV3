@@ -1,6 +1,6 @@
 """
 Vercel Serverless Function entry point for Synaptia Flask Application.
-Handles Vercel URL rewrites and normalizes WSGI PATH_INFO.
+Handles Vercel URL rewrites and normalizes WSGI PATH_INFO from request headers.
 """
 
 import os
@@ -22,13 +22,26 @@ class VercelWSGIWrapper:
         self.wsgi_app = wsgi_app
 
     def __call__(self, environ, start_response):
-        path = environ.get("PATH_INFO", "")
-        if path.startswith("/api/index.py"):
-            new_path = path[len("/api/index.py") :] or "/"
-            environ["PATH_INFO"] = new_path
-        elif path.startswith("/api/index"):
-            new_path = path[len("/api/index") :] or "/"
-            environ["PATH_INFO"] = new_path
+        # Read the real requested path from Vercel proxy headers
+        real_path = (
+            environ.get("HTTP_X_FORWARDED_PATH")
+            or environ.get("HTTP_X_NOW_ROUTE_MATCHES")
+            or environ.get("HTTP_X_VERCEL_PATH")
+            or environ.get("REQUEST_URI")
+            or environ.get("PATH_INFO", "")
+        )
+
+        # Strip query parameters if present
+        if "?" in real_path:
+            real_path = real_path.split("?", 1)[0]
+
+        # Normalize rewrite prefixes
+        if real_path.startswith("/api/index.py"):
+            real_path = real_path[len("/api/index.py") :] or "/"
+        elif real_path.startswith("/api/index"):
+            real_path = real_path[len("/api/index") :] or "/"
+
+        environ["PATH_INFO"] = real_path
         return self.wsgi_app(environ, start_response)
 
 
