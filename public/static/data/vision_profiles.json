@@ -3,10 +3,10 @@
     "id": "person_001",
     "name": "Sarah Jenkins",
     "relationship": "Daughter",
-    "description": "Sarah and the user talked about preparing for Sunday by organizing soccer gear and packing lunch.",
+    "description": "Sarah and the user talked about getting the soccer gear organized and preparing lunch for the upcoming Sunday.",
     "avatar_color": "#6366f1",
     "created_at": "2026-03-01T10:00:00",
-    "last_seen": "2026-09-15T02:21:31.842343",
+    "last_seen": "2026-09-15T10:31:20.037505",
     "confidence": 0.96,
     "tags": [
       "Family",
@@ -14,6 +14,24 @@
       "Priority"
     ],
     "interactions": [
+      {
+        "ts": "2026-09-15T10:31:20.037470",
+        "transcript": "We discussed organizing the soccer gear and packing lunch for Sunday.",
+        "summary": "Sarah and the user talked about getting the soccer gear organized and preparing lunch for the upcoming Sunday.",
+        "sentiment": "neutral-positive"
+      },
+      {
+        "ts": "2026-09-15T10:23:45.494446",
+        "transcript": "We discussed organizing the soccer gear and packing lunch for Sunday.",
+        "summary": "You and Sarah Jenkins talked about planning to organize the soccer gear and pack lunch for the upcoming Sunday.",
+        "sentiment": "neutral-positive"
+      },
+      {
+        "ts": "2026-09-15T09:53:06.135503",
+        "transcript": "We discussed organizing the soccer gear and packing lunch for Sunday.",
+        "summary": "Sarah mentioned that they talked about organizing soccer gear and preparing lunch for an upcoming Sunday event.",
+        "sentiment": "positive"
+      },
       {
         "ts": "2026-09-15T02:21:31.842327",
         "transcript": "We discussed organizing the soccer gear and packing lunch for Sunday.",
@@ -156,7 +174,7 @@
     "avatar_color": "#f59e0b",
     "face_thumbnail": null,
     "created_at": "2026-09-10T00:59:30.260511",
-    "last_seen": "2026-09-15T02:21:30.866895",
+    "last_seen": "2026-09-15T10:31:13.405013",
     "confidence": 0.95,
     "tags": [
       "Enrolled"
