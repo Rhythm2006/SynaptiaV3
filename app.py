@@ -259,6 +259,24 @@ def health():
     }), 200
 
 
+@app.route("/api/debug", methods=["GET"])
+def debug_environ():
+    """Temporary debug endpoint — dumps WSGI environ keys for Vercel routing diagnosis."""
+    from flask import request as _req
+    env = _req.environ
+    interesting = {}
+    for key in sorted(env.keys()):
+        val = env[key]
+        if isinstance(val, str) and len(val) < 500:
+            interesting[key] = val
+    return jsonify({
+        "flask_path": _req.path,
+        "flask_url":  _req.url,
+        "flask_method": _req.method,
+        "environ": interesting,
+    }), 200
+
+
 @app.route("/api/model/status", methods=["GET"])
 def model_status():
     """
