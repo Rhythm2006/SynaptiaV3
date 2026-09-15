@@ -5,6 +5,7 @@ Handles Vercel URL rewrites and normalizes WSGI PATH_INFO from request headers.
 
 import os
 import sys
+import urllib.parse
 
 # Ensure root directory is on the Python path
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -22,24 +23,46 @@ class VercelWSGIWrapper:
         self.wsgi_app = wsgi_app
 
     def __call__(self, environ, start_response):
-        # Read the real requested path from Vercel proxy headers
+        # 1. Check if Vercel provided route regex capture matches
+        matches_str = environ.get("HTTP_X_NOW_ROUTE_MATCHES") or environ.get("HTTP_X_VERCEL_MATCHES", "")
+        extracted_path = None
+        if matches_str:
+            try:
+                parsed = urllib.parse.parse_qs(matches_str)
+                # Match group 1 from /(.*)
+                if "1" in parsed and parsed["1"]:
+                    captured = parsed["1"][0]
+                    if not captured.startswith("/"):
+                        captured = "/" + captured
+                    extracted_path = captured
+            except Exception:
+                pass
+
         real_path = (
-            environ.get("HTTP_X_FORWARDED_PATH")
-            or environ.get("HTTP_X_NOW_ROUTE_MATCHES")
+            extracted_path
+            or environ.get("HTTP_X_FORWARDED_PATH")
+            or environ.get("HTTP_X_FORWARDED_URI")
+            or environ.get("HTTP_X_MATCHED_PATH")
             or environ.get("HTTP_X_VERCEL_PATH")
             or environ.get("REQUEST_URI")
-            or environ.get("PATH_INFO", "")
+            or environ.get("RAW_URI")
+            or environ.get("PATH_INFO", "/")
         )
 
         # Strip query parameters if present
         if "?" in real_path:
             real_path = real_path.split("?", 1)[0]
 
-        # Normalize rewrite prefixes
+        # Normalize rewrite prefixes if the path itself is pointing to the handler file
         if real_path.startswith("/api/index.py"):
             real_path = real_path[len("/api/index.py") :] or "/"
-        elif real_path.startswith("/api/index"):
+        elif real_path.startswith("/api/index") and (
+            len(real_path) == len("/api/index") or real_path[len("/api/index")] == "/"
+        ):
             real_path = real_path[len("/api/index") :] or "/"
+
+        if not real_path.startswith("/"):
+            real_path = "/" + real_path
 
         environ["PATH_INFO"] = real_path
         return self.wsgi_app(environ, start_response)
