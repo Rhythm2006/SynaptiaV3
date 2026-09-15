@@ -49,8 +49,76 @@ progress_tracker = ProgressTracker()
 interview_coach  = InterviewCoach()
 vision_memory    = VisionMemoryEngine()
 
+import urllib.parse
+
 # In-memory session tracking
 session_stats = {}
+
+
+class VercelWSGIWrapper:
+    """
+    Normalizes PATH_INFO when deployed as a Serverless Function on Vercel.
+    Extracts the original request path from the rewrite parameter (__path__)
+    or proxy headers so Flask routes match accurately.
+    """
+
+    def __init__(self, wsgi_app):
+        self.wsgi_app = wsgi_app
+
+    def __call__(self, environ, start_response):
+        query_string = environ.get("QUERY_STRING", "")
+        extracted_path = None
+
+        # 1. Primary: Extract from __path__ query param passed by vercel.json rewrite
+        if "__path__=" in query_string:
+            try:
+                params = urllib.parse.parse_qs(query_string)
+                if "__path__" in params and params["__path__"]:
+                    extracted_path = urllib.parse.unquote(params["__path__"][0])
+                    # Clean __path__ from query string so request.args remains clean
+                    clean_params = {k: v for k, v in params.items() if k != "__path__"}
+                    environ["QUERY_STRING"] = urllib.parse.urlencode(clean_params, doseq=True)
+            except Exception:
+                pass
+
+        # 2. Secondary: Route match headers or proxy forwarded paths
+        if not extracted_path:
+            for header in [
+                "HTTP_X_FORWARDED_PATH",
+                "HTTP_X_FORWARDED_URI",
+                "HTTP_X_MATCHED_PATH",
+                "HTTP_X_INVOKE_PATH",
+                "HTTP_X_VERCEL_PATH",
+            ]:
+                val = environ.get(header)
+                if val and val not in ("/api/index.py", "/api/index"):
+                    extracted_path = val
+                    break
+
+        if extracted_path:
+            # Strip query string if present in extracted path
+            if "?" in extracted_path:
+                extracted_path = extracted_path.split("?", 1)[0]
+            # Normalize rewrite prefixes
+            if extracted_path.startswith("/api/index.py"):
+                extracted_path = extracted_path[len("/api/index.py"):] or "/"
+            elif extracted_path.startswith("/api/index") and (
+                len(extracted_path) == len("/api/index") or extracted_path[len("/api/index")] == "/"
+            ):
+                extracted_path = extracted_path[len("/api/index"):] or "/"
+
+            if not extracted_path.startswith("/"):
+                extracted_path = "/" + extracted_path
+
+            environ["PATH_INFO"] = extracted_path
+
+        return self.wsgi_app(environ, start_response)
+
+
+# Wrap Flask WSGI application for production/serverless environments
+app.wsgi_app = VercelWSGIWrapper(app.wsgi_app)
+handler = app
+
 
 # Enable native CORS for VS Code Live Server usage
 @app.after_request
@@ -58,23 +126,12 @@ def apply_cors(response):
     response.headers["Access-Control-Allow-Origin"] = "*"
     response.headers["Access-Control-Allow-Headers"] = "Content-Type"
     response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
-    # ── TEMPORARY DEBUG HEADERS ──
-    from flask import request as _r
-    response.headers["X-Debug-Path"] = _r.path
-    response.headers["X-Debug-Method"] = _r.method
-    response.headers["X-Debug-URL"] = _r.url[:200]
-    env = _r.environ
-    response.headers["X-Debug-PathInfo"] = env.get("PATH_INFO", "??")
-    response.headers["X-Debug-QS"] = env.get("QUERY_STRING", "??")[:200]
-    response.headers["X-Debug-RouteMatches"] = env.get("HTTP_X_NOW_ROUTE_MATCHES", "none")[:200]
     return response
 
 
 # ============== WEB UI ==============
 
 @app.route("/")
-@app.route("/api/index")
-@app.route("/api/index.py")
 def index():
     """Serve the main web interface"""
     return render_template("index.html")
