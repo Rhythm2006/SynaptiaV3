@@ -21,16 +21,16 @@ logger = logging.getLogger(__name__)
 import re
 
 GROQ_API_KEY  = os.getenv("GROQ_API_KEY", "")
-GROQ_MODEL    = os.getenv("GROQ_MODEL", "groq/compound-mini")
+GROQ_MODEL    = os.getenv("GROQ_MODEL", "openai/gpt-oss-120b")
 GROQ_BASE_URL = "https://api.groq.com/openai/v1"
-GROQ_TIMEOUT  = 60
+GROQ_TIMEOUT  = (3.0, 8.0)
 
 FALLBACK_MODELS = [
-    GROQ_MODEL,
+    "openai/gpt-oss-120b",
+    "openai/gpt-oss-20b",
+    "qwen/qwen3.8-27b",
     "groq/compound-mini",
-    "llama-3.3-70b-versatile",
-    "llama-3.1-8b-instant",
-    "mixtral-8x7b-32768",
+    "groq/compound",
 ]
 
 
@@ -53,7 +53,7 @@ def _groq_chat(messages: list, temperature: float = 0.75, max_tokens: int = 600)
     }
 
     primary_model = os.getenv("GROQ_MODEL") or GROQ_MODEL
-    models_to_try = [primary_model] + [m for m in FALLBACK_MODELS if m != primary_model]
+    models_to_try = ([primary_model] + [m for m in FALLBACK_MODELS if m != primary_model])[:3]
 
     for model in models_to_try:
         payload = {
@@ -68,9 +68,8 @@ def _groq_chat(messages: list, temperature: float = 0.75, max_tokens: int = 600)
                 logger.error("[HintProvider] Groq API: invalid API key (401).")
                 return None
             if resp.status_code == 429:
-                logger.warning("[HintProvider] Groq rate limit hit on model %s. Retrying in 2s...", model)
-                time.sleep(2)
-                resp = requests.post(url, headers=headers, json=payload, timeout=GROQ_TIMEOUT)
+                logger.warning("[HintProvider] Rate limit on %s (429) — failing over to next model.", model)
+                continue
             if resp.ok:
                 data = resp.json()
                 text = data.get("choices", [{}])[0].get("message", {}).get("content", "").strip()

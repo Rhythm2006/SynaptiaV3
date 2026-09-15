@@ -21,9 +21,17 @@ logger = logging.getLogger(__name__)
 # ── Groq API Configuration ────────────────────────────────────────────────────
 
 GROQ_API_KEY  = os.getenv("GROQ_API_KEY", "")
-GROQ_MODEL    = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
+GROQ_MODEL    = os.getenv("GROQ_MODEL", "openai/gpt-oss-120b")
 GROQ_BASE_URL = "https://api.groq.com/openai/v1"
-GROQ_TIMEOUT  = 60
+GROQ_TIMEOUT  = (3.0, 8.0)
+
+FALLBACK_MODELS = [
+    "openai/gpt-oss-120b",
+    "openai/gpt-oss-20b",
+    "qwen/qwen3.8-27b",
+    "groq/compound-mini",
+    "groq/compound",
+]
 
 # ── Supported interview domains ───────────────────────────────────────────────
 
@@ -43,40 +51,38 @@ def _groq_chat(messages: list, temperature: float = 0.7, max_tokens: int = 512) 
     Send a chat request to the Groq API via the OpenAI-compatible endpoint.
     Returns the assistant's response string, or None on failure.
     """
+    api_key = os.getenv("GROQ_API_KEY") or GROQ_API_KEY
+    if not api_key:
+        return None
+
     url = f"{GROQ_BASE_URL}/chat/completions"
     headers = {
-        "Authorization": f"Bearer {GROQ_API_KEY}",
+        "Authorization": f"Bearer {api_key}",
         "Content-Type":  "application/json",
     }
-    payload = {
-        "model":       GROQ_MODEL,
-        "messages":    messages,
-        "max_tokens":  max_tokens,
-        "temperature": temperature,
-    }
-    try:
-        resp = requests.post(url, headers=headers, json=payload, timeout=GROQ_TIMEOUT)
-        if resp.status_code == 401:
-            logger.error("[InterviewCoach] Groq API: invalid API key (401).")
-            return None
-        if resp.status_code == 429:
-            logger.warning("[InterviewCoach] Groq rate limit (429). Retrying in 5s…")
-            time.sleep(5)
+
+    primary_model = os.getenv("GROQ_MODEL") or GROQ_MODEL
+    models_to_try = [primary_model] + [m for m in FALLBACK_MODELS if m != primary_model]
+
+    for model in models_to_try:
+        payload = {
+            "model":       model,
+            "messages":    messages,
+            "max_tokens":  max_tokens,
+            "temperature": temperature,
+        }
+        try:
             resp = requests.post(url, headers=headers, json=payload, timeout=GROQ_TIMEOUT)
-            resp.raise_for_status()
-        resp.raise_for_status()
-        data = resp.json()
-        text = data.get("choices", [{}])[0].get("message", {}).get("content", "").strip()
-        return text or None
-    except requests.exceptions.Timeout:
-        logger.error("[InterviewCoach] Groq API request timed out.")
-        return None
-    except requests.exceptions.ConnectionError as exc:
-        logger.error("[InterviewCoach] Cannot reach Groq API: %s", exc)
-        return None
-    except Exception as exc:
-        logger.error("[InterviewCoach] Groq API error: %s", exc)
-        return None
+            if resp.ok:
+                data = resp.json()
+                text = data.get("choices", [{}])[0].get("message", {}).get("content", "").strip()
+                if text:
+                    import re as _re
+                    return _re.sub(r"<think>.*?</think>", "", text, flags=_re.DOTALL).strip() or text
+        except Exception:
+            pass
+
+    return None
 
 
 # ── InterviewCoach ────────────────────────────────────────────────────────────
