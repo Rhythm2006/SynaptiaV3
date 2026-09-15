@@ -23,20 +23,34 @@ class VercelWSGIWrapper:
         self.wsgi_app = wsgi_app
 
     def __call__(self, environ, start_response):
-        # 1. Check if Vercel provided route regex capture matches
-        matches_str = environ.get("HTTP_X_NOW_ROUTE_MATCHES") or environ.get("HTTP_X_VERCEL_MATCHES", "")
+        # 1. Check if Vercel passed __path__ in the rewritten query string
+        query_string = environ.get("QUERY_STRING", "")
         extracted_path = None
-        if matches_str:
+        if "__path__=" in query_string:
             try:
-                parsed = urllib.parse.parse_qs(matches_str)
-                # Match group 1 from /(.*)
-                if "1" in parsed and parsed["1"]:
-                    captured = parsed["1"][0]
-                    if not captured.startswith("/"):
-                        captured = "/" + captured
-                    extracted_path = captured
+                params = urllib.parse.parse_qs(query_string)
+                if "__path__" in params and params["__path__"]:
+                    extracted_path = params["__path__"][0]
+                    # Clean __path__ out of QUERY_STRING so application request.args is pristine
+                    clean_params = {k: v for k, v in params.items() if k != "__path__"}
+                    environ["QUERY_STRING"] = urllib.parse.urlencode(clean_params, doseq=True)
             except Exception:
                 pass
+
+        # 2. Check if Vercel provided route regex capture matches in headers
+        if not extracted_path:
+            matches_str = environ.get("HTTP_X_NOW_ROUTE_MATCHES") or environ.get("HTTP_X_VERCEL_MATCHES", "")
+            if matches_str:
+                try:
+                    parsed = urllib.parse.parse_qs(matches_str)
+                    # Match group 1 from /(.*)
+                    if "1" in parsed and parsed["1"]:
+                        captured = parsed["1"][0]
+                        if not captured.startswith("/"):
+                            captured = "/" + captured
+                        extracted_path = captured
+                except Exception:
+                    pass
 
         real_path = (
             extracted_path
