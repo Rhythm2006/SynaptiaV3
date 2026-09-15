@@ -19,6 +19,13 @@
 
 ---
 
+## 📚 In-Depth Project Guides & Analysis
+
+* 📖 **[Clinical Use Cases, Feasibility & Scalability Guide](USE_CASES_AND_FEASIBILITY.md)**: Comprehensive evaluation of target patient personas, global dementia/stroke health data, real-world deployment environments, technical feasibility, economic ROI, and scalability benchmarks.
+* 🛠️ **[Architecture & Pipeline Technical Manual](PIPELINE_EXPLANATION.md)**: Deep technical dive into the dual-engine pipeline, sub-second latency breakdown, data schemas, WSGI serverless routing, and code maps.
+
+---
+
 ## 🚀 Key Feature: AR Memory Recall & Capped Highlight Distillation
 
 Smart glasses wearers and dementia patients need instant, scannable memory reminders without being overwhelmed by endless paragraphs of conversation history. Synaptia introduces an **End-of-Sentence Voice-Verified Memory Distillation Pipeline**:
