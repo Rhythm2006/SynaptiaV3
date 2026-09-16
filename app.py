@@ -773,17 +773,35 @@ def api_reset_all():
 
 @app.route("/api/voice-identities", methods=["PUT"])
 def api_voice_identities_put():
+    payload = request.get_json() or {}
+    name = (payload.get("name") or "").strip().lower()
+    descriptor = payload.get("descriptor") or []
+    if name and descriptor:
+        identities = _get_face_identities()
+        if name in identities:
+            identities[name]["voice_descriptor"] = descriptor
+            identities[name]["voice_updated_at"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            _save_face_identities(identities)
     return jsonify({"enrolled": True}), 200
 
 @app.route("/api/voice-identities/<person_name>", methods=["GET"])
 def api_voice_identities_get(person_name):
-    return jsonify({"name": person_name, "has_voiceprint": False, "descriptor": None}), 200
+    name = person_name.strip().lower()
+    identities = _get_face_identities()
+    person_rec = identities.get(name, {})
+    desc = person_rec.get("voice_descriptor")
+    return jsonify({
+        "name": person_name,
+        "has_voiceprint": desc is not None and len(desc) > 0,
+        "descriptor": desc
+    }), 200
 
 @app.route("/api/transcriptions", methods=["POST"])
 def api_transcriptions():
     """Transcribe real browser audio segments via Groq Whisper and distill memory cues."""
     try:
         import base64
+        import math
         import requests
 
         payload = request.get_json() or {}
@@ -795,6 +813,26 @@ def api_transcriptions():
         filename = payload.get("filename") or "speech.webm"
         content_type = payload.get("content_type") or "audio/webm"
         person_name = payload.get("person_name")
+        candidate_voice = payload.get("voice_descriptor")
+
+        # Speaker Verification if voiceprint is enrolled
+        if person_name and candidate_voice:
+            identities = _get_face_identities()
+            person_rec = identities.get(person_name.strip().lower(), {})
+            enrolled_voice = person_rec.get("voice_descriptor")
+            if enrolled_voice and len(enrolled_voice) > 0 and len(candidate_voice) > 0:
+                dot = sum(a * b for a, b in zip(candidate_voice, enrolled_voice))
+                norm_a = math.sqrt(sum(a * a for a in candidate_voice))
+                norm_b = math.sqrt(sum(b * b for b in enrolled_voice))
+                sim = dot / (norm_a * norm_b) if norm_a and norm_b else 0.0
+                if sim < 0.48:
+                    return jsonify({
+                        "stored": False,
+                        "text": "",
+                        "reason": "Bystander voice filtered out (unverified speaker)",
+                        "verified": False,
+                        "similarity": sim
+                    }), 200
 
         groq_api_key = app.config.get("GROQ_API_KEY") or os.getenv("GROQ_API_KEY")
         transcribed_text = ""
@@ -853,6 +891,7 @@ def api_transcriptions():
     except Exception as e:
         app.logger.warning(f"api_transcriptions handler error: {e}")
         return jsonify({"stored": False, "text": "", "reason": str(e)}), 200
+
 
 
 

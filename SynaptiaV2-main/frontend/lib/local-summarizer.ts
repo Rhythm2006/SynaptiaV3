@@ -8,7 +8,32 @@ let loadingPromise: Promise<any> | null = null
  * Uses ONNX-quantized Xenova/distilbart-cnn-6-6 running locally in WebAssembly/WebGPU.
  */
 export async function getLocalSummarizer() {
-  return null
+  if (typeof window === "undefined") return null
+  if (summarizerPipeline) return summarizerPipeline
+  if (loadingPromise) return loadingPromise
+
+  loadingPromise = (async () => {
+    try {
+      console.log("[LocalSummarizer] Loading Hugging Face Xenova pipeline from CDN...")
+      const moduleLoader = new Function('return import("https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2")')
+      const { pipeline, env } = await moduleLoader()
+      env.allowLocalModels = false
+      env.useBrowserCache = true
+
+      summarizerPipeline = await pipeline("summarization", "Xenova/distilbart-cnn-6-6", {
+        quantized: true,
+      })
+      console.log("[LocalSummarizer] Hugging Face in-browser neural summarizer ready!")
+      return summarizerPipeline
+    } catch (err) {
+      console.warn("[LocalSummarizer] Hugging Face CDN load failed, using fallback:", err)
+      return null
+    } finally {
+      loadingPromise = null
+    }
+  })()
+
+  return loadingPromise
 }
 
 /**
@@ -131,6 +156,26 @@ export async function summarizeTranscriptLocally(
     return null
   }
 
+  // 1. In-browser Hugging Face Transformers.js (Xenova/distilbart-cnn-6-6)
+  try {
+    const pipe = await getLocalSummarizer()
+    if (pipe) {
+      const result = await pipe(clean, {
+        max_new_tokens: 40,
+        min_new_tokens: 8,
+      })
+      if (Array.isArray(result) && result[0]?.summary_text) {
+        let summary = result[0].summary_text.trim()
+        if (!HALLUCINATION_REGEX.test(summary)) {
+          return formatLocalHighlights(summary, personName)
+        }
+      }
+    }
+  } catch (err) {
+    console.warn("[LocalSummarizer] In-browser Hugging Face inference skipped:", err)
+  }
+
+  // 2. Cloud Groq LPU memory distiller fallback
   try {
     const res = await fetch("/api/v2/memory/distill", {
       method: "POST",
@@ -142,10 +187,10 @@ export async function summarizeTranscriptLocally(
       if (data.summary) return data.summary
     }
   } catch (err) {
-    console.warn("[LocalSummarizer] Cloud distiller unreachable, falling back:", err)
+    console.warn("[LocalSummarizer] Cloud distiller unreachable, using local highlight:", err)
   }
 
-  // Synthesize a third-person highlight summary from the action
+  // 3. Synthesize a clean third-person highlight summary
   return formatLocalHighlights(clean, personName)
 }
 

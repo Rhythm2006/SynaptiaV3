@@ -275,10 +275,10 @@ export function useServerTranscription({ enabled, stream, personName }: UseServe
     }
 
     // Voice Activity Detection Loop: runs every 50ms
-    // With 180Hz High-Pass Filter active, silence is < 0.008, speaking is 0.018 - 0.20
-    const SPEECH_START_RMS = 0.018
-    const SPEECH_CONTINUE_RMS = 0.010
-    const SILENCE_TO_STOP_MS = 800
+    // With 180Hz High-Pass Filter active, background room noise is < 0.005, natural speech is 0.008 - 0.15
+    const SPEECH_START_RMS = 0.008
+    const SPEECH_CONTINUE_RMS = 0.004
+    const SILENCE_TO_STOP_MS = 700
 
     setStatus("listening")
 
@@ -295,10 +295,10 @@ export function useServerTranscription({ enabled, stream, personName }: UseServe
       const isVoiced = rms >= SPEECH_START_RMS
 
       if (!isRecordingUtterance) {
-        // Listening for speech onset: requires 2 consecutive frames (100ms)
+        // Listening for speech onset: requires 1 frame (50ms) to trigger quickly
         if (isVoiced) {
           consecutiveSpeechFrames++
-          if (consecutiveSpeechFrames >= 2) {
+          if (consecutiveSpeechFrames >= 1) {
             consecutiveSpeechFrames = 0
             startUtteranceRecording()
           }
