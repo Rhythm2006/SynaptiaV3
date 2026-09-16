@@ -779,6 +779,82 @@ def api_voice_identities_put():
 def api_voice_identities_get(person_name):
     return jsonify({"name": person_name, "has_voiceprint": False, "descriptor": None}), 200
 
+@app.route("/api/transcriptions", methods=["POST"])
+def api_transcriptions():
+    """Transcribe real browser audio segments via Groq Whisper and distill memory cues."""
+    try:
+        import base64
+        import requests
+
+        payload = request.get_json() or {}
+        audio_b64 = payload.get("audio_base64")
+        if not audio_b64:
+            return jsonify({"stored": False, "text": "", "reason": "No audio provided"}), 200
+
+        audio_bytes = base64.b64decode(audio_b64)
+        filename = payload.get("filename") or "speech.webm"
+        content_type = payload.get("content_type") or "audio/webm"
+        person_name = payload.get("person_name")
+
+        groq_api_key = app.config.get("GROQ_API_KEY") or os.getenv("GROQ_API_KEY")
+        transcribed_text = ""
+
+        if groq_api_key and len(audio_bytes) > 2000:
+            headers = {"Authorization": f"Bearer {groq_api_key}"}
+            files = {"file": (filename, audio_bytes, content_type)}
+            data = {
+                "model": "whisper-large-v3-turbo",
+                "response_format": "verbose_json",
+                "language": "en",
+                "temperature": "0",
+            }
+            try:
+                res = requests.post(
+                    "https://api.groq.com/openai/v1/audio/transcriptions",
+                    headers=headers,
+                    files=files,
+                    data=data,
+                    timeout=25,
+                )
+                if res.status_code == 200:
+                    res_json = res.json()
+                    transcribed_text = res_json.get("text", "").strip()
+                else:
+                    app.logger.warning(f"Groq transcription returned {res.status_code}: {res.text[:200]}")
+            except Exception as e:
+                app.logger.warning(f"Groq transcription request failed: {e}")
+
+        if not transcribed_text:
+            return jsonify({"stored": False, "text": "", "reason": "No speech detected"}), 200
+
+        summary = ""
+        try:
+            summary_data = vision_memory.generate_memory_summary(person_name or "Person", transcribed_text)
+            summary = summary_data.get("summary", "")
+        except Exception:
+            summary = f"• Spoke about: {transcribed_text[:60]}…"
+
+        if person_name:
+            memories = _get_person_memories()
+            memories[person_name.strip().lower()] = {
+                "name": person_name.strip(),
+                "summary": summary,
+                "updated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            }
+            _save_person_memories(memories)
+
+        return jsonify({
+            "stored": True,
+            "text": transcribed_text,
+            "summary": summary,
+            "verified": True
+        }), 201
+
+    except Exception as e:
+        app.logger.warning(f"api_transcriptions handler error: {e}")
+        return jsonify({"stored": False, "text": "", "reason": str(e)}), 200
+
+
 
 # ============== ERROR HANDLERS ==============
 
