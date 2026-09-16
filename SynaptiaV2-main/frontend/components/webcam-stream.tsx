@@ -20,7 +20,7 @@ import {
 type FaceTimestampMap = Map<string, number>
 
 const UNIDENTIFIED_TIMEOUT_MS = 4000 // Show "Unidentified" after 4 seconds with no SSE data
-const INFERENCE_BACKEND_URL = "http://localhost:8002"
+const INFERENCE_BACKEND_URL = process.env.NEXT_PUBLIC_API_BASE ?? (typeof window !== "undefined" && window.location.port !== "3000" ? "" : "http://localhost:8002")
 
 function captureFaceCrop(video: HTMLVideoElement, face: DetectedFace): string | null {
   const { originX, originY, width, height } = face.boundingBox

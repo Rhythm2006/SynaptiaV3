@@ -8,31 +8,7 @@ let loadingPromise: Promise<any> | null = null
  * Uses ONNX-quantized Xenova/distilbart-cnn-6-6 running locally in WebAssembly/WebGPU.
  */
 export async function getLocalSummarizer() {
-  if (typeof window === "undefined") return null
-  if (summarizerPipeline) return summarizerPipeline
-  if (loadingPromise) return loadingPromise
-
-  loadingPromise = (async () => {
-    try {
-      const { pipeline, env } = await import("@huggingface/transformers")
-      env.allowLocalModels = false
-      env.useBrowserCache = true
-
-      console.log("[LocalSummarizer] Initializing in-browser Hugging Face neural pipeline...")
-      summarizerPipeline = await pipeline("summarization", "Xenova/distilbart-cnn-6-6", {
-        dtype: "q8",
-      })
-      console.log("[LocalSummarizer] Hugging Face in-browser summarizer ready.")
-      return summarizerPipeline
-    } catch (err) {
-      console.warn("[LocalSummarizer] Could not load in-browser Hugging Face pipeline, using fallback:", err)
-      return null
-    } finally {
-      loadingPromise = null
-    }
-  })()
-
-  return loadingPromise
+  return null
 }
 
 /**
@@ -156,20 +132,17 @@ export async function summarizeTranscriptLocally(
   }
 
   try {
-    const pipe = await getLocalSummarizer()
-    if (pipe) {
-      const result = await pipe(clean, {
-        max_new_tokens: 40,
-        min_new_tokens: 8,
-      })
-      if (Array.isArray(result) && result[0]?.summary_text) {
-        let summary = result[0].summary_text.trim()
-        if (HALLUCINATION_REGEX.test(summary)) return null
-        return formatLocalHighlights(summary, personName)
-      }
+    const res = await fetch("/api/v2/memory/distill", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ person_name: personName, transcript: clean }),
+    })
+    if (res.ok) {
+      const data = await res.json()
+      if (data.summary) return data.summary
     }
   } catch (err) {
-    console.warn("[LocalSummarizer] Local neural inference warning:", err)
+    console.warn("[LocalSummarizer] Cloud distiller unreachable, falling back:", err)
   }
 
   // Synthesize a third-person highlight summary from the action

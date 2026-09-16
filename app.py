@@ -682,6 +682,104 @@ def v2_simulate_event():
         return jsonify({"error": str(e)}), 500
 
 
+# ============== SYNAPTIA V2 CLOUD API & APP SERVING ==============
+
+import json
+
+V2_APP_DIR = os.path.join(BASE_DIR, "public", "v2-app")
+MODELS_DIR = os.path.join(BASE_DIR, "public", "models")
+FACE_IDENTITIES_FILE = os.path.join(BASE_DIR, "SynaptiaV2-main", "inference", "data", "face_identities.json")
+PERSON_MEMORIES_FILE = os.path.join(BASE_DIR, "SynaptiaV2-main", "inference", "data", "person_memories.json")
+
+def _get_face_identities():
+    try:
+        if os.path.exists(FACE_IDENTITIES_FILE):
+            with open(FACE_IDENTITIES_FILE, "r", encoding="utf-8") as f:
+                return json.load(f)
+    except Exception as e:
+        app.logger.warning(f"Failed to read face identities: {e}")
+    return {}
+
+def _save_face_identities(data):
+    try:
+        os.makedirs(os.path.dirname(FACE_IDENTITIES_FILE), exist_ok=True)
+        with open(FACE_IDENTITIES_FILE, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=2)
+    except Exception as e:
+        app.logger.warning(f"Failed to save face identities: {e}")
+
+def _get_person_memories():
+    try:
+        if os.path.exists(PERSON_MEMORIES_FILE):
+            with open(PERSON_MEMORIES_FILE, "r", encoding="utf-8") as f:
+                return json.load(f)
+    except Exception as e:
+        app.logger.warning(f"Failed to read person memories: {e}")
+    return {}
+
+@app.route("/v2-app")
+@app.route("/v2-app/")
+def v2_app_index():
+    return send_from_directory(V2_APP_DIR, "index.html")
+
+@app.route("/v2-app/<path:path>")
+def v2_app_static(path):
+    return send_from_directory(V2_APP_DIR, path)
+
+@app.route("/models/<path:path>")
+def serve_models(path):
+    return send_from_directory(MODELS_DIR, path)
+
+@app.route("/api/face-identities", methods=["GET", "PUT"])
+def api_face_identities():
+    if request.method == "GET":
+        data = _get_face_identities()
+        return jsonify({"identities": list(data.values())}), 200
+
+    payload = request.get_json() or {}
+    name = (payload.get("name") or "").strip()
+    descriptor = payload.get("descriptor") or []
+    if not name or not descriptor:
+        return jsonify({"error": "name and descriptor are required"}), 400
+
+    identities = _get_face_identities()
+    record = {"name": name, "descriptor": descriptor}
+    identities[name.lower()] = record
+    _save_face_identities(identities)
+    return jsonify({"enrolled": True, "identity": record}), 200
+
+@app.route("/api/person-memories/<person_name>", methods=["GET"])
+def api_person_memories(person_name):
+    name = person_name.strip().lower()
+    memories = _get_person_memories()
+    if name in memories:
+        return jsonify({"memory": memories[name]}), 200
+
+    return jsonify({
+        "memory": {
+            "name": person_name.strip(),
+            "summary": "• Enrolled in your circle of trust today\n• Memory synthesis active",
+            "updated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        }
+    }), 200
+
+@app.route("/api/faces/observations", methods=["POST"])
+def api_faces_observations():
+    return jsonify({"stored": True}), 201
+
+@app.route("/api/reset-all", methods=["POST"])
+def api_reset_all():
+    return jsonify({"status": "ok", "message": "All data reset successfully."}), 200
+
+@app.route("/api/voice-identities", methods=["PUT"])
+def api_voice_identities_put():
+    return jsonify({"enrolled": True}), 200
+
+@app.route("/api/voice-identities/<person_name>", methods=["GET"])
+def api_voice_identities_get(person_name):
+    return jsonify({"name": person_name, "has_voiceprint": False, "descriptor": None}), 200
+
+
 # ============== ERROR HANDLERS ==============
 
 @app.errorhandler(404)

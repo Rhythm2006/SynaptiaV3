@@ -20,6 +20,7 @@ interface EnrollmentResult {
 
 const MODEL_URL = "/models/face-api"
 const MATCH_THRESHOLD = 0.52
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? (typeof window !== "undefined" && window.location.port !== "3000" ? "" : "http://localhost:8002")
 
 function descriptorMatch(descriptor: Float32Array, identities: FaceIdentity[]): FaceMatch | null {
   let closest: FaceMatch | null = null
@@ -79,7 +80,7 @@ export function useFaceRecognition(video: HTMLVideoElement | null, enabled: bool
 
     // 2. Fetch from backend and merge
     try {
-      const response = await fetch("http://localhost:8002/api/face-identities")
+      const response = await fetch(`${API_BASE}/api/face-identities`)
       if (response.ok) {
         const body = (await response.json()) as { identities?: FaceIdentity[] }
         const serverIdentities = body.identities ?? []
@@ -205,7 +206,7 @@ export function useFaceRecognition(video: HTMLVideoElement | null, enabled: bool
       identitiesRef.current = currentLocal
 
       try {
-        await fetch("http://localhost:8002/api/face-identities", {
+        await fetch(`${API_BASE}/api/face-identities`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(newIdentity),

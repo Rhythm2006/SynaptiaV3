@@ -1797,7 +1797,7 @@ window.navigateTo = (function(prev) {
 function initV2Page() {
   const frame = $('#v2AppFrame');
   if (frame && (!frame.src || frame.src === 'about:blank' || frame.src === window.location.href)) {
-    frame.src = 'http://localhost:3000';
+    frame.src = '/v2-app';
   }
 }
 

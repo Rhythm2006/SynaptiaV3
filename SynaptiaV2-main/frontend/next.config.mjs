@@ -1,5 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: 'export',
+  basePath: '/v2-app',
   eslint: {
     ignoreDuringBuilds: true,
   },
