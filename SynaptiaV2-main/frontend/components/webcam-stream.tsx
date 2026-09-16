@@ -99,11 +99,9 @@ export default function WebcamStream() {
     lastSpeakerStatus,
     enrollVoice,
   } = useServerTranscription({
-    // Do not write a conversation until the face matcher has a confirmed,
-    // explicitly enrolled identity to attach it to.
-    enabled: isStreaming && !isMuted && Boolean(faceMatch?.name),
+    enabled: isStreaming && !isMuted,
     stream: streamRef.current,
-    personName: faceMatch?.name,
+    personName: faceMatch?.name ?? "Wearer",
   })
 
   const enrollCurrentFace = async () => {
@@ -435,7 +433,7 @@ export default function WebcamStream() {
                   top={notification!.position.top}
                   confidence={notification!.face.confidence}
                   name={isRecognized ? faceMatch?.name : undefined}
-                  description={isRecognized ? newMemorySummary ?? memorySummary ?? undefined : undefined}
+                  description={newMemorySummary ?? memorySummary ?? undefined}
                   isUnidentified={isUnidentified}
                 />
               )

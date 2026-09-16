@@ -837,9 +837,14 @@ def api_transcriptions():
         groq_api_key = app.config.get("GROQ_API_KEY") or os.getenv("GROQ_API_KEY")
         transcribed_text = ""
 
-        if groq_api_key and len(audio_bytes) > 2000:
+        clean_ct = (content_type or "audio/webm").split(";")[0].strip()
+        if not clean_ct.startswith("audio/"):
+            clean_ct = "audio/webm"
+        clean_filename = "speech.mp4" if "mp4" in clean_ct else "speech.webm"
+
+        if groq_api_key and len(audio_bytes) > 1500:
             headers = {"Authorization": f"Bearer {groq_api_key}"}
-            files = {"file": (filename, audio_bytes, content_type)}
+            files = {"file": (clean_filename, audio_bytes, clean_ct)}
             data = {
                 "model": "whisper-large-v3-turbo",
                 "response_format": "verbose_json",

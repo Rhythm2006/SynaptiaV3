@@ -1,12 +1,17 @@
 {
   "rhythm": {
     "name": "rhythm",
-    "summary": "\u2022 Met Rhythm two years ago; golfed together yesterday\n\u2022 Discussed databases; voice verified Rhythm\n\u2022 Mentioned Pelties",
-    "updated_at": "2026-09-15 06:06:31.464237"
+    "summary": "\u2022 Rhythm: golf, databases, voice\u2011verified, Pelties\n\u2022 Meeting tomorrow with dementia patients\n\u2022 Attended wedding yesterday",
+    "updated_at": "2026-09-16 06:30:17.145310"
   },
   "ashwin": {
     "name": "ashwin",
-    "summary": "\u2022 Played poker and squash together, won squash match\n\u2022 Bought tofu for me at supermarket",
-    "updated_at": "2026-09-15 06:06:48.868902"
+    "summary": "\u2022 Played poker and squash together; won squash match\n\u2022 Bought tofu for user at supermarket",
+    "updated_at": "2026-09-16 05:26:25.314071"
+  },
+  "sir": {
+    "name": "sir",
+    "summary": "\u2022 Sir is enrolled; statements recorded for recaps.\n\u2022 Recording captures everything he sees.\n\u2022 He bought tofu at the supermarket.",
+    "updated_at": "2026-09-15 10:44:10.304004"
   }
 }
